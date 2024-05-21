@@ -17,7 +17,7 @@ import {
 
 const dividerColor = "black"; // Example color, change it to the color you want
 
-const FilesTable = ({ files, onDelete, onEdit }) => (
+const FilesTable = ({ files, onDelete, onEdit, handleEditDialogOpen }) => (
   <TableContainer
     component={Paper}
     sx={{
@@ -72,15 +72,22 @@ const FilesTable = ({ files, onDelete, onEdit }) => (
               align="right"
               sx={{ border: 1, borderColor: dividerColor }}
             >
+              {file.filePath && ( // Check if filePath is defined
+                <a
+                  href={`http://localhost:3000/uploads/${file.filePath.replace(
+                    /^uploads\//,
+                    ""
+                  )}`}
+                  download
+                  style={{ color: "inherit" }}
+                >
+                  <IconButton sx={{ color: "primary.contrastText" }}>
+                    <CloudDownloadIcon />
+                  </IconButton>
+                </a>
+              )}
               <IconButton
-                href={file.filePath}
-                download
-                sx={{ color: "primary.contrastText" }}
-              >
-                <CloudDownloadIcon />
-              </IconButton>
-              <IconButton
-                onClick={() => onEdit(file.id)}
+                onClick={() => handleEditDialogOpen(file)}
                 sx={{ color: "primary.contrastText" }}
               >
                 <EditIcon />

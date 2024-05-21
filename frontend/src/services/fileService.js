@@ -5,6 +5,7 @@ const API_URL = `${API_BASE_URL}/files`;
 
 const getFiles = () => axios.get(API_URL);
 const uploadFile = (fileData) => axios.post(API_URL, fileData);
+
 const deleteFile = (id) => axios.delete(`${API_URL}/${id}`);
 const updateFile = (id, description) =>
   axios.put(`${API_URL}/${id}`, { description });

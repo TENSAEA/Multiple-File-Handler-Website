@@ -14,7 +14,8 @@ const uploadFile = async (fileData, setFiles) => {
     const response = await fileService.uploadFile(fileData);
     setFiles((prevFiles) => [...prevFiles, response.data]);
   } catch (error) {
-    console.error("Error uploading file:", error);
+    console.error("Error uploading file:", error.message);
+    console.error("Stack trace:", error.stack);
   }
 };
 

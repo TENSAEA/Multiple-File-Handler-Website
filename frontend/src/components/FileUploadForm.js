@@ -20,52 +20,67 @@ import {
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
+import fileController from "../controller/fileController";
 
-const FileUploadForm = () => {
+const FileUploadForm = ({
+  onUpload,
+  onEdit,
+  editDialogOpen,
+  setEditDialogOpen,
+  handleEditDialogClose,
+  currentDescription,
+  setCurrentDescription,
+  currentFile,
+  setCurrentFile,
+}) => {
   const [files, setFiles] = useState([]);
   const [description, setDescription] = useState("");
-  const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const [currentFile, setCurrentFile] = useState(null);
-  const [currentDescription, setCurrentDescription] = useState("");
 
   const handleFileChange = (event) => {
     setFiles([...event.target.files]);
   };
 
-  const handleUpload = () => {
-    const filesWithDescription = Array.from(files).map((file) => {
-      return {
-        ...file,
-        description: description,
-      };
+  const handleUpload = async () => {
+    const formData = new FormData();
+    files.forEach((file) => {
+      formData.append("file", file);
+      formData.append("description", description);
     });
-
-    setFiles(filesWithDescription);
-
-    setDescription("");
+    try {
+      await onUpload(formData);
+      setFiles([]);
+      setDescription("");
+    } catch (error) {
+      console.error("Error uploading file:", error);
+    }
   };
 
   // ... rest of your component
 
-  const handleDelete = (fileToDelete) => {
-    setFiles(files.filter((file) => file !== fileToDelete));
+  const handleDelete = async (fileToDelete) => {
+    try {
+      await fileController.deleteFile(fileToDelete.id);
+      setFiles(files.filter((file) => file.id !== fileToDelete.id));
+    } catch (error) {
+      console.error("Error deleting file:", error);
+      // Handle the error appropriately in the UI
+    }
   };
 
   const handleEditDialogOpen = (file) => {
     setCurrentFile(file);
-    setCurrentDescription(description);
+    setCurrentDescription(file.description);
     setEditDialogOpen(true);
   };
 
-  const handleEditDialogClose = () => {
-    setEditDialogOpen(false);
-  };
-
-  const handleEditDescription = () => {
-    // Here you would normally send the updated description to the backend
-    // For now, we'll just close the dialog
-    setDescription(currentDescription);
-    handleEditDialogClose();
+  const handleEditDescription = async () => {
+    try {
+      await onEdit(currentFile.id, currentDescription);
+      handleEditDialogClose();
+    } catch (error) {
+      console.error("Error updating file description:", error);
+      // Handle the error appropriately in the UI
+    }
   };
 
   return (
@@ -155,7 +170,10 @@ const FileUploadForm = () => {
           <Button onClick={handleEditDialogClose} color="primary">
             Cancel
           </Button>
-          <Button onClick={handleEditDescription} color="primary">
+          <Button
+            onClick={handleEditDescription} // Use handleEditDescription here
+            color="primary"
+          >
             Update
           </Button>
         </DialogActions>

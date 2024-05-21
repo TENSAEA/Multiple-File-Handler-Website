@@ -15,6 +15,9 @@ File.init(
   { sequelize, modelName: "file" }
 );
 
-sequelize.sync();
+sequelize
+  .sync()
+  .then(() => console.log("Database synchronized"))
+  .catch((err) => console.error("Failed to synchronize database:", err));
 
 module.exports = File;
